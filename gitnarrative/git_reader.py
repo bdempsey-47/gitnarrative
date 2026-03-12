@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import logging
 import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
-from git import Repo
+from git import GitCommandError, Repo
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -30,6 +33,7 @@ def read_commits(
     repo_path: Path,
     since: str | None = None,
     until: str | None = None,
+    max_count: int | None = None,
 ) -> list[Commit]:
     """Read commits from a git repo, returning them in chronological order."""
     repo = Repo(repo_path)
@@ -39,6 +43,8 @@ def read_commits(
         log_args["since"] = since
     if until:
         log_args["until"] = until
+    if max_count is not None:
+        log_args["max_count"] = max_count
 
     commits: list[Commit] = []
     for git_commit in repo.iter_commits("HEAD", **log_args):
@@ -53,8 +59,10 @@ def read_commits(
                         deletions=stat.get("deletions", 0),
                     )
                 )
-        except Exception:
+        except (KeyError, ValueError, GitCommandError):
             pass  # merge commits or empty commits may not have stats
+        except Exception:
+            logger.debug("Unexpected error reading stats for %s", git_commit.hexsha[:8], exc_info=True)
 
         commits.append(
             Commit(

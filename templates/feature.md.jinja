@@ -1,0 +1,21 @@
+### {{ feature.feature_name }}
+
+**Complexity:** {{ feature.complexity }} | **Commits:** {{ cluster.commits | length }} | **Period:** {{ cluster.start.strftime('%Y-%m-%d') }} to {{ cluster.end.strftime('%Y-%m-%d') }}
+
+{{ feature.summary }}
+
+{% if feature.phases %}
+**Phases:**
+{% for phase in feature.phases %}
+{{ loop.index }}. {{ phase }}
+{% endfor %}
+{% endif %}
+{% if feature.decisions %}
+**Key Decisions:**
+{% for decision in feature.decisions %}
+- {{ decision }}
+{% endfor %}
+{% endif %}
+{% if feature.files_primary %}
+**Primary Files:** `{{ feature.files_primary | join('`, `') }}`
+{% endif %}

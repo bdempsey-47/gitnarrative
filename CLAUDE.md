@@ -53,18 +53,18 @@ Lookup order: `ANTHROPIC_API_KEY` env var → system keyring. Env var wins if bo
 
 ### Running
 ```powershell
-gitnarrative init --repo C:\Projects\MLSNextSchedule --since 2026-03-05
+gitnarrative narrate --repo C:\Projects\MLSNextSchedule --since 2026-03-05
 ```
 
 ### Dry Run (no LLM calls, tests pipeline stages 1+2)
 ```powershell
-gitnarrative init --repo C:\Projects\MLSNextSchedule --since 2026-03-05 --dry-run
+gitnarrative narrate --repo C:\Projects\MLSNextSchedule --since 2026-03-05 --dry-run
 ```
 
 ### CLI Structure
-Adding the `config` subcommand group means Typer no longer flattens — `init` is now an explicit subcommand:
+Adding the `config` subcommand group means Typer no longer flattens — `narrate` is an explicit subcommand:
 ```
-gitnarrative init --repo <path> --since <date> [--until <date>] [--model <model>] [--max-commits N] [--dry-run]
+gitnarrative narrate --repo <path> --since <date> [--until <date>] [--model <model>] [--max-commits N] [--dry-run]
 gitnarrative config set-key
 ```
 

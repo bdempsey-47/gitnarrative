@@ -54,7 +54,7 @@ _DETAIL_CHOICES = ("full", "significant", "auto")
 
 
 @app.command()
-def init(
+def narrate(
     repo: Path = typer.Option(
         ".",
         help="Path to the git repository to analyze.",

@@ -13,7 +13,7 @@ It's built for developers onboarding onto unfamiliar codebases and teams that wa
 
 ## Sample Output
 
-Running `gitnarrative init --repo ./weather-app --since 2024-06-01` produces a synthesized narrative like this:
+Running `gitnarrative narrate --repo ./weather-app --since 2024-06-01` produces a synthesized narrative like this:
 
 ```markdown
 # weather-app — Project Narrative
@@ -148,7 +148,7 @@ The environment variable is checked first; the keyring is used as fallback.
 ### Basic
 
 ```bash
-gitnarrative init --repo ./my-project --since 2024-01-01
+gitnarrative narrate --repo ./my-project --since 2024-01-01
 ```
 
 Output is written to `.gitnarrative/narrative.md` inside the target repo.
@@ -158,7 +158,7 @@ Output is written to `.gitnarrative/narrative.md` inside the target repo.
 Test the pipeline (stages 1-3) without making any LLM calls:
 
 ```bash
-gitnarrative init --repo ./my-project --since 2024-01-01 --dry-run
+gitnarrative narrate --repo ./my-project --since 2024-01-01 --dry-run
 ```
 
 ### CLI Options
@@ -190,7 +190,7 @@ of its evolution. Use the output to understand what was built, in what order,
 and what key decisions were made.
 
 Steps:
-1. Run: `gitnarrative init --repo . --since 2024-01-01`
+1. Run: `gitnarrative narrate --repo . --since 2024-01-01`
 2. Read the output at `.gitnarrative/narrative.md`
 3. Use the narrative to inform your understanding of the codebase architecture
    and design decisions

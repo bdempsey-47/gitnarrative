@@ -38,6 +38,18 @@ class Cluster:
     def end(self):
         return max(c.date for c in self.commits)
 
+    @property
+    def total_churn(self) -> int:
+        return sum(f.insertions + f.deletions for c in self.commits for f in c.files)
+
+    @property
+    def total_insertions(self) -> int:
+        return sum(f.insertions for c in self.commits for f in c.files)
+
+    @property
+    def total_deletions(self) -> int:
+        return sum(f.deletions for c in self.commits for f in c.files)
+
 
 def _non_trivial_files(commit: Commit) -> set[str]:
     """Return file paths that are meaningful for clustering."""

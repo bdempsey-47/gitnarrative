@@ -1,0 +1,7 @@
+## Minor Changes
+
+| Date | Description | Files | Lines |
+|------|-------------|-------|-------|
+{% for cluster in minor_clusters -%}
+| {{ cluster.start.strftime('%Y-%m-%d') }} | {{ cluster.commits[0].message[:80] }} | {{ cluster.files | length }} | +{{ cluster.total_insertions }}/-{{ cluster.total_deletions }} |
+{% endfor %}

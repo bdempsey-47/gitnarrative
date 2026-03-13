@@ -50,6 +50,9 @@ def config_set_key() -> None:
     typer.echo("API key stored in system keyring.")
 
 
+_DETAIL_CHOICES = ("full", "significant", "auto")
+
+
 @app.command()
 def init(
     repo: Path = typer.Option(
@@ -73,6 +76,16 @@ def init(
         "--max-commits",
         help="Maximum number of commits to process (default: 500).",
     ),
+    detail: str = typer.Option(
+        "auto",
+        "--detail",
+        help="Detail level: full (narrate all), significant (skip minor), auto (significant if >20 clusters).",
+    ),
+    no_synthesize: bool = typer.Option(
+        False,
+        "--no-synthesize",
+        help="Skip synthesis step; output verbose per-feature narrations.",
+    ),
     dry_run: bool = typer.Option(
         False,
         "--dry-run",
@@ -80,10 +93,16 @@ def init(
     ),
 ) -> None:
     """Analyze git history and generate a narrative markdown file."""
+    from gitnarrative.classifier import classify_cluster, partition_clusters
     from gitnarrative.clusterer import cluster_commits
     from gitnarrative.git_reader import read_commits
-    from gitnarrative.narrator import FeatureNarrative, narrate_all
-    from gitnarrative.store import render_narrative, write_narrative
+    from gitnarrative.narrator import narrate_all
+    from gitnarrative.store import render_feature_blocks, render_narrative, write_narrative
+    from gitnarrative.synthesizer import synthesize
+
+    if detail not in _DETAIL_CHOICES:
+        typer.echo(f"Error: --detail must be one of: {', '.join(_DETAIL_CHOICES)}", err=True)
+        raise typer.Exit(1)
 
     repo = repo.resolve()
     if not (repo / ".git").exists():
@@ -110,32 +129,51 @@ def init(
     clusters = cluster_commits(commits)
     typer.echo(f"  Found {len(clusters)} clusters.")
 
+    # Determine effective detail level
+    use_filter = detail == "significant" or (detail == "auto" and len(clusters) > 20)
+
+    if use_filter:
+        major_clusters, minor_clusters = partition_clusters(clusters)
+    else:
+        major_clusters, minor_clusters = clusters, []
+
     for i, cluster in enumerate(clusters, 1):
+        tag = ""
+        if use_filter:
+            tag = " MAJOR" if cluster in major_clusters else " MINOR"
         typer.echo(
-            f"  [{i}] {cluster.name} "
+            f"  [{i}]{tag} {cluster.name} "
             f"({len(cluster.commits)} commits, "
             f"{cluster.start:%Y-%m-%d} to {cluster.end:%Y-%m-%d})"
+        )
+
+    if use_filter:
+        typer.echo(
+            f"\n  {len(major_clusters)} major clusters to narrate, "
+            f"{len(minor_clusters)} minor clusters for appendix."
         )
 
     if dry_run:
         typer.echo(f"\nDry run — {len(commits)} commits, {len(clusters)} clusters. Skipping LLM narration.")
         raise typer.Exit(0)
 
-    if len(clusters) > 50:
-        typer.echo(
-            f"\n  Warning: {len(clusters)} clusters will require {len(clusters)} API calls. "
-            "Consider narrowing the date range or using --max-commits."
-        )
+    typer.echo(f"\nGenerating narratives via Claude ({len(major_clusters)} clusters)...")
+    narratives = narrate_all(major_clusters, model=model)
 
-    typer.echo("\nGenerating narratives via Claude...")
-    narratives = narrate_all(clusters, model=model)
+    synthesized_content = None
+    if not no_synthesize:
+        typer.echo("Synthesizing narrative...")
+        feature_blocks = render_feature_blocks(major_clusters, narratives)
+        synthesized_content = synthesize(feature_blocks, repo.name, commits=commits)
 
     content = render_narrative(
-        clusters=clusters,
+        clusters=major_clusters,
         narratives=narratives,
         repo_path=repo,
         since=since,
         until=until,
+        minor_clusters=minor_clusters if minor_clusters else None,
+        synthesized_content=synthesized_content,
     )
 
     output_file = write_narrative(content, repo)

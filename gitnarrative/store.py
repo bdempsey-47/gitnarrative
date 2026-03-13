@@ -10,8 +10,8 @@ from jinja2 import Environment, FileSystemLoader
 from gitnarrative.clusterer import Cluster
 from gitnarrative.narrator import FeatureNarrative
 
-# Locate templates relative to this package
-TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
+# Locate templates inside this package
+TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
 
 
 def render_feature_blocks(

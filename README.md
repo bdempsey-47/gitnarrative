@@ -91,19 +91,19 @@ Not every cluster needs a full LLM narrative. gitnarrative classifies clusters t
 
 - **Multi-commit clusters** are always **major** (they represent real features)
 - **Single-commit clusters** are **minor** if they match any of:
-  - Docs-only changes (`.md`, `LICENSE`, `docs/`)
-  - CI/config-only changes (`.yml`, `.toml`, `Dockerfile`, `.github/`)
+  - Docs-only changes (`.md`, `.txt`, `.rst`, `LICENSE`, `docs/`)
+  - CI/config-only changes (`.yml`, `.yaml`, `.toml`, `.cfg`, `Dockerfile`, `.dockerignore`, `.gitignore`, `.github/`)
   - Commit prefix is `chore:`, `docs:`, `ci:`, `style:`, or `build:`
   - Merge commits or empty commits
 
-Major clusters get full LLM narration. Minor clusters are rendered as a compact table.
+Major clusters get full LLM narration. Minor clusters are excluded from the synthesized output (or rendered as a compact table in `--no-synthesize` mode).
 
 The `--detail` flag controls this behavior:
 
 | Value | Behavior |
 |-------|----------|
 | `full` | Narrate every cluster (no minor classification) |
-| `significant` | Skip minor clusters, render them as a table |
+| `significant` | Skip minor clusters from narration |
 | `auto` (default) | Use `significant` when >20 clusters, `full` otherwise |
 
 ## Getting Started
@@ -114,6 +114,12 @@ The `--detail` flag controls this behavior:
 - An [Anthropic API key](https://console.anthropic.com/)
 
 ### Install
+
+```bash
+pip install git+https://github.com/bdempsey-47/gitnarrative.git
+```
+
+Or for development:
 
 ```bash
 git clone https://github.com/bdempsey-47/gitnarrative.git
@@ -135,7 +141,7 @@ Or set it as an environment variable:
 export ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-The keyring is checked first; the environment variable overrides it if set.
+The environment variable is checked first; the keyring is used as fallback.
 
 ## Usage
 
@@ -162,7 +168,7 @@ gitnarrative init --repo ./my-project --since 2024-01-01 --dry-run
 | `--repo` | `.` | Path to the git repository to analyze |
 | `--since` | None | Start date (`YYYY-MM-DD` or `YYYY-MM-DDTHH:MM:SS`) |
 | `--until` | None | End date (same formats) |
-| `--model` | `claude-haiku-4-5-20251001` | Claude model to use |
+| `--model` | `claude-haiku-4-5-20251001` | Claude model for narration (synthesis uses Sonnet) |
 | `--max-commits` | `500` | Maximum commits to process |
 | `--detail` | `auto` | Detail level: `full`, `significant`, or `auto` |
 | `--no-synthesize` | off | Skip synthesis; output verbose per-feature narrations |

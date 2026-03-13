@@ -18,19 +18,23 @@ Key design: LLM returns JSON, templates render markdown. This separates content 
 ## Project Structure
 ```
 gitnarrative/
-├── gitnarrative/         # Package
-│   ├── __init__.py       # Version string
-│   ├── cli.py            # Typer CLI entry point
-│   ├── git_reader.py     # Stage 1: git log extraction
-│   ├── clusterer.py      # Stage 2: heuristic clustering
-│   ├── narrator.py       # Stage 3: LLM narration
-│   └── store.py          # Template rendering + file output
-├── templates/            # Jinja2 templates
-│   ├── feature.md.jinja  # Per-feature block
-│   └── narrative.md.jinja # Top-level document
-├── pyproject.toml        # Package config + CLI entry point
+├── gitnarrative/              # Package
+│   ├── __init__.py            # Version string
+│   ├── cli.py                 # Typer CLI entry point
+│   ├── git_reader.py          # Stage 1: git log extraction
+│   ├── clusterer.py           # Stage 2: heuristic clustering
+│   ├── classifier.py          # Stage 2.5: major/minor classification
+│   ├── narrator.py            # Stage 3: LLM narration
+│   ├── synthesizer.py         # Stage 4: LLM synthesis
+│   ├── store.py               # Template rendering + file output
+│   └── templates/             # Jinja2 templates (inside package for distribution)
+│       ├── feature.md.jinja   # Per-feature block
+│       ├── minor_summary.md.jinja  # Minor changes table
+│       ├── narrative.md.jinja      # Verbose top-level document
+│       └── synthesized.md.jinja    # Synthesized top-level document
+├── pyproject.toml             # Package config + CLI entry point
 ├── .gitignore
-└── CLAUDE.md             # This file
+└── CLAUDE.md                  # This file
 ```
 
 ## Development

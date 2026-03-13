@@ -6,7 +6,24 @@ build-backend = "hatchling.build"
 name = "gitnarrative"
 version = "0.1.0"
 description = "LLM-powered CLI that reads git history and generates narrative markdown describing a project's evolution"
+readme = "README.md"
+license = "MIT"
 requires-python = ">=3.11"
+authors = [
+    { name = "Brian Dempsey" },
+]
+keywords = ["git", "narrative", "documentation", "llm", "claude"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Documentation",
+]
 dependencies = [
     "typer>=0.12",
     "anthropic>=0.40",
@@ -17,6 +34,11 @@ dependencies = [
 
 [project.scripts]
 gitnarrative = "gitnarrative.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/bdempsey-47/gitnarrative"
+Repository = "https://github.com/bdempsey-47/gitnarrative"
+Issues = "https://github.com/bdempsey-47/gitnarrative/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["gitnarrative"]
